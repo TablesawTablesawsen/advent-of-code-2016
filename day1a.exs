@@ -75,7 +75,7 @@ end
 
 defmodule Day1a do
     def run do
-        File.read!('/home/tablesaw/erlang/elixir/advent/day1.txt')
+        File.read!('day1.txt')
         |> String.split(", ")
         |> Enum.map(&translate_step/1)
         |> Position.follow_directions

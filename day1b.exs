@@ -97,9 +97,9 @@ defmodule Position do
     end
 end
 
-defmodule Day2a do
+defmodule Day1b do
     def run do
-        File.read!('/home/tablesaw/erlang/elixir/advent/day1.txt')
+        File.read!('day1.txt')
         |> String.split(", ")
         |> Enum.map(&translate_step/1)
         |> Position.follow_directions
@@ -117,4 +117,4 @@ defmodule Day2a do
 
 end
 
-IO.puts Day2a.run
+IO.puts Day1b.run

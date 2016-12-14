@@ -1,6 +1,6 @@
 defmodule Day3b do
     def run do
-        File.read!('/home/tablesaw/erlang/elixir/advent/day3.txt')
+        File.read!('day3.txt')
         |> String.split
         |> Enum.map(&String.to_integer/1)
         |> Enum.chunk(3)

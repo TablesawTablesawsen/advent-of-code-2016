@@ -7,9 +7,9 @@ defmodule Day2b do
     }
 
     def run do
-        File.read!('/home/tablesaw/erlang/elixir/advent/day2.txt')
+        File.read!('day2.txt')
         |> String.split
-        |> Enum.map(&Day2.string_to_instructions/1)
+        |> Enum.map(&string_to_instructions/1)
         |> Enum.reduce([], &Keypad.find_locations/2)
         |> Enum.reverse
         |> Enum.map(&Keypad.location_to_number/1)

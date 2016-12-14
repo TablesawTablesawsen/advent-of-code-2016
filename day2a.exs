@@ -19,7 +19,7 @@ defmodule Day2a do
     def string_to_instructions(string) do
         string
         |> String.graphemes
-        |> Enum.map(&Map.fetch!(@instruction_map, &1))
+        |> Enum.map(&(@instruction_map[&1]))
     end
 
 end

@@ -18,7 +18,7 @@ defmodule Day2b do
     def string_to_instructions(string) do
         string
         |> String.graphemes
-        |> Enum.map(&Map.fetch!(@instruction_map, &1))
+        |> Enum.map(&(@instruction_map[&1]))
     end
 end
 
@@ -87,8 +87,7 @@ defmodule Keypad do
     end
 
     def location_to_number(location) do
-        @keymap
-        |> Map.fetch!(location)
+        @keymap[location]
     end
 end
 

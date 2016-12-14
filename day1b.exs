@@ -1,81 +1,120 @@
+defmodule Location do
+    defstruct x: 0, y: 0
+
+    def move(%Location{x: x} = location, :right, distance) do
+        %Location{ location | x: x + distance }
+    end
+
+    def move(%Location{x: x} = location, :left, distance) do
+        %Location{ location | x: x - distance }
+    end
+
+    def move(%Location{y: y} = location, :up, distance) do
+        %Location{ location | y: y + distance }
+    end
+
+    def move(%Location{y: y} = location, :down, distance) do
+        %Location{ location | y: y - distance }
+    end
+
+    def distance_from_origin(%Location{x: x, y: y}) do
+        abs(x) + abs(y)
+    end
+end
+
 defmodule Position do
-    defstruct direction: 0, location: %{x: 0, y: 0}, history: nil, answer: nil
+    defstruct orientation: :up, location: %Location{}, final_location: nil, history: []
 
-    def find_position (directions) do
-        default = %Position{}
-        find_position %Position{default | history: MapSet.new([default.location])}, directions
+    @degree_map %{
+        up: 0,
+        right: 90,
+        down: 180,
+        left: 270
+    }
+    @direction_map %{
+        0 => :up,
+        90 => :right,
+        180 => :down,
+        270 => :left
+    }
+
+    def rotate(%Position{orientation: orientation} = position, turn) do
+        new_direction = dir_to_deg(orientation) + dir_to_deg(turn)
+                        |> rem(360)
+                        |> deg_to_dir
+
+        %Position{ position | orientation: new_direction}
     end
 
-    defp find_position(position, [step | directions]) do
-        step
-        |> handle_step()
-        |> update_position(position)
-        |> find_position(directions)
-    end
-
-    defp find_position(position, []) do
+    def forward(position, 0) do
         position
     end
 
-    defp handle_step("R" <> number) do
+    def forward(%Position{final_location: %Location{}} = position, _) do
+        position
+    end
+
+    def forward(%Position{orientation: orientation, location: location} = position, distance) do
+        %Position{ position | location: Location.move(location, orientation, 1)}
+        |> check_location
+        |> forward(distance - 1)
+    end
+
+    def check_location(%Position{location: location, history: history} = position) do
+        if Enum.member?(history, location) do
+            %Position{position | final_location: location}
+        else
+            %Position{position | history: [location | history]}
+        end
+    end
+
+    def dir_to_deg(direction) do
+        @degree_map[direction]
+
+    end
+
+    def deg_to_dir(degrees) do
+        @direction_map[degrees]
+    end
+
+    def follow_directions(directions) do
+        follow_directions(%Position{}, directions)
+    end
+
+    def follow_directions(%Position{final_location: %Location{}} = position, _directions) do
+        position
+    end
+
+    def follow_directions(%Position{location: location} = position, []) do
+        %Position{position | final_location: location}
+    end
+
+    def follow_directions(position, [{turn, distance} | directions]) do
+        position
+        |> Position.rotate(turn)
+        |> Position.forward(distance)
+        |> follow_directions(directions)
+    end
+end
+
+defmodule Day2a do
+    def run do
+        File.read!('/home/tablesaw/erlang/elixir/advent/day1.txt')
+        |> String.split(", ")
+        |> Enum.map(&translate_step/1)
+        |> Position.follow_directions
+        |> Map.fetch!(:final_location)
+        |> Location.distance_from_origin
+    end
+
+    defp translate_step("R" <> number) do
         {:right, String.to_integer(number)}
     end
 
-    defp handle_step("L" <> number) do
+    defp translate_step("L" <> number) do
         {:left, String.to_integer(number)}
     end
 
-    defp update_position({turn, distance}, position) do
-        position
-        |> change_direction(turn)
-        |> move_distance(distance)
-    end
-
-    defp change_direction(position, :right) do
-        update_in(position.direction, &(rem(&1+90, 360)))
-    end
-
-    defp change_direction(position, :left) do
-        update_in(position.direction, &(rem(&1+270, 360)))
-    end
-
-    defp move_distance(%Position{answer: %{}} = position, _) do
-        position
-    end
-
-    defp move_distance(position, 0) do
-        position
-    end
-
-    defp move_distance(%Position{direction: 0} = position, distance) do
-        update_in(position.location.x, &(&1 + 1))
-        |> check_location
-        |> move_distance(distance - 1)
-    end
-
-    defp move_distance(%Position{direction: 180} = position, distance) do
-        update_in(position.location.x, &(&1 - 1))
-        |> check_location
-        |> move_distance(distance - 1)
-    end
-
-    defp move_distance(%Position{direction: 90} = position, distance) do
-        update_in(position.location.y, &(&1 + 1))
-        |> check_location
-        |> move_distance(distance - 1)
-    end
-
-    defp move_distance(%Position{direction: 270} = position, distance) do
-        update_in(position.location.y, &(&1 - 1))
-        |> check_location
-        |> move_distance(distance - 1)
-    end
-
-    defp check_location(%Position{history: history, location: location} = position) do
-        if MapSet.member?(history, location) do
-            put_in(position.answer, location)
-        else
-            update_in(position.history, &MapSet.put(&1, location))
-        end
-    end
 end
+
+IO.puts Day2a.run

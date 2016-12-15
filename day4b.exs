@@ -1,6 +1,4 @@
 defmodule Day4b do
-    @a_value 97
-    @hyphen_value 45
     @space_value 32
 
     def run do
@@ -62,12 +60,12 @@ defmodule Day4b do
         Enum.map charlist, &(char_shift &1, value)
     end
 
-    defp char_shift(char, _) when char == @hyphen_value do
+    defp char_shift(?-, _) do
         @space_value
     end
 
     defp char_shift(char, value) do
-        rem(char - @a_value + value, 26) + @a_value
+        rem(char - ?a + value, 26) + ?a
     end
 
 end

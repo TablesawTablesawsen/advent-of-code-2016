@@ -20,31 +20,34 @@ defmodule Day7 do
     end
 
     def supports_SSL string do
-        [h, s] = Regex.split(@hypernet, string, include_captures: true)
+        Regex.split(@hypernet, string, include_captures: true)
+        |> Enum.partition(&(Regex.match? @hypernet, &1))  #  Elixir 1.3
+        |> protocol_split
+        |> matching_pattern
+    end
 
-        #  Elixir 1.4
-        # |> Enum.split_with(&(Regex.match? @hypernet, &1))
-        # |> Enum.map(&Tuple.to_list/1)
+    def matching_pattern {hypernet, supernet} do
+        not MapSet.disjoint? hypernet, supernet
+    end
 
-        #  Elixir 1.3
-        |> Enum.partition(&(Regex.match? @hypernet, &1))
-        |> Tuple.to_list
-
-        |> Enum.map(&aba_list/1)
-
-        not MapSet.disjoint? hypernet_tuples(h), supernet_tuples(s)
+    def protocol_split {hypernet, supernet} do
+        {hypernet_list(hypernet), supernet_list(supernet)}
     end
 
     def aba_list list do
-]        Enum.flat_map list, &(Regex.scan @aba, &1)
+        Enum.flat_map list, &(Regex.scan @aba, &1)
     end
 
-    def hypernet_tuples list do
-        Enum.into list, %MapSet{}, fn [_, a, b] -> {a,b} end
+    def hypernet_list list do
+        list
+        |> aba_list
+        |> Enum.into(%MapSet{}, fn [_, a, b] -> {a,b} end)
     end
 
-    def supernet_tuples list do
-        Enum.into list, %MapSet{}, fn [_, a, b] -> {b,a} end
+    def supernet_list list do
+        list
+        |> aba_list
+        |> Enum.into(%MapSet{}, fn [_, a, b] -> {b,a} end)
     end
 
     def run do

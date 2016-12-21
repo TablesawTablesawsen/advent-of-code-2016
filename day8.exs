@@ -21,7 +21,7 @@ defmodule LittleScreen do
         rect old_screen, columns, rows-1, [new_row | new_screen]
     end
 
-    def rect_row row, columns do
+    defp rect_row row, columns do
         rect_row row, columns, []
     end
 
@@ -46,7 +46,7 @@ defmodule LittleScreen do
         List.replace_at screen, row, new_row
     end
 
-    def swap {front, back} do
+    defp swap {front, back} do
         back ++ front
     end
 

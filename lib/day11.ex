@@ -2,20 +2,31 @@ require Astar
 
 defmodule Day11 do
     def test do
-        env = {&RTF.possible_moves/1, &RTF.edge_cost/2, &RTF.heuristic_to_state/2}
-        path = Astar.astar env, RTF.test, RTF.goal(RTF.test)
+        path = RTF.shortest_path_to_goal RTF.test
         length(path)
     end
 
+    # 9.8s
     def part_one do
-        env = {&RTF.possible_moves/1, &RTF.edge_cost/2, &RTF.heuristic_to_state/2}
-        path = Astar.astar env, RTF.real, RTF.goal(RTF.real)
+        path = RTF.shortest_path_to_goal RTF.real
         length(path)
     end
 
+    # 16m 6s
+    def part_two do
+        path = RTF.shortest_path_to_goal RTF.realer
+        length(path)
+    end
 end
 
 defmodule RTF do
+    def astar_env do
+        {&RTF.possible_moves/1, &RTF.edge_cost/2, &RTF.heuristic_to_state/2}
+    end
+
+    def shortest_path_to_goal rtf do
+        Astar.astar RTF.astar_env, rtf, RTF.goal(rtf)
+    end
 
     def test do
         f1 = MapSet.new [{:H, :chip}, {:Li, :chip}]
@@ -39,6 +50,16 @@ defmodule RTF do
 
     def real do
         f1 = MapSet.new [{:Tm, :generator}, {:Tm, :chip}, {:Pu, :generator}, {:Sr, :generator}]
+        f2 = MapSet.new [{:Pu, :chip}, {:Sr, :chip}]
+        f3 = MapSet.new [{:Pm, :generator}, {:Pm, :chip}, {:Ru, :generator}, {:Ru, :chip}]
+        f4 = %MapSet{}
+        %{  floors: %{1 => f1, 2 => f2, 3 => f3, 4 => f4},
+            elevator: 1
+        }
+    end
+
+    def realer do
+        f1 = MapSet.new [{:Tm, :generator}, {:Tm, :chip}, {:Pu, :generator}, {:Sr, :generator}, {:El, :generator}, {:El, :chip}, {:Dl, :generator}, {:Dl, :chip}]
         f2 = MapSet.new [{:Pu, :chip}, {:Sr, :chip}]
         f3 = MapSet.new [{:Pm, :generator}, {:Pm, :chip}, {:Ru, :generator}, {:Ru, :chip}]
         f4 = %MapSet{}

@@ -18,6 +18,58 @@ defmodule Day12 do
     def run_part_one do
         Assembunny.process_instructions input()
     end
+
+    def run_part_two do
+        registers = %{Assembunny.blank | "c" => 1}
+        indexed_instructions = input() |> Enum.with_index
+        Assembunny.process_instructions registers, indexed_instructions, 0
+    end
+
+    def fibonacci(1), do: 1
+    def fibonacci(2), do: 1
+    def fibonacci(n), do: fibonacci(n-1) + fibonacci(n-2)
+
+    def modern_assembunny(c) do
+        # cpy 1 a
+        # Seed for fibonacci series
+
+        # cpy 1 b
+        # Seed for fibonacci series
+
+        # cpy 26 d
+        d = 26
+
+        # jnz c 2
+        # jnz 1 5
+        d = if c != 0 do
+            # cpy 7 c
+            # inc d
+            # dec c
+            # jnz c -2
+            d + 7
+        else
+            d
+        end
+
+        # cpy a c
+        # inc a
+        # dec b
+        # jnz b -2
+        # cpy c b
+        # dec d
+        # jnz d -6
+        a = fibonacci(d + 2)
+
+        # cpy 16 c
+        # cpy 17 d
+        # inc a
+        # dec d
+        # jnz d -2
+        # dec c
+        # jnz c -5
+        a + 17 * 16
+    end
+
 end
 
 defmodule Assembunny do
@@ -30,6 +82,7 @@ defmodule Assembunny do
     end
 
     def process_instructions(registers, instructions, index) when index < length(instructions) do
+        IO.inspect registers
         {next_registers, next_index} = process_instruction registers, Enum.at(instructions, index)
         process_instructions next_registers, instructions, next_index
     end
@@ -59,11 +112,16 @@ defmodule Assembunny do
     end
 
     def process_instruction registers, index, ["jnz", x, y] do
-        if registers[x] == 0 do
+        value = with {int, _} <- Integer.parse(x) do
+            int
+        else
+            :error -> registers[x]
+        end
+
+        if value == 0 do
             {registers, index + 1}
         else
             {registers, index + String.to_integer(y)}
         end
     end
-
 end

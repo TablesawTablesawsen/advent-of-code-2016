@@ -2,15 +2,15 @@ require Astar
 require Integer
 
 defmodule Day13 do
-    def run do
-        length(ZorkFarm.shortest_path {7,4})
+    def run_part_one do
+        length(ZorkFarm.shortest_path {31,39})
     end
 end
 
 defmodule ZorkFarm do
     @astar_env {&ZorkFarm.possible_moves/1, &ZorkFarm.edge_cost/2, &ZorkFarm.heuristic_to_state/2}
     @lobby {1,1}
-    @favorite_number 10
+    @favorite_number 1364
 
     def shortest_path goal do
         Astar.astar @astar_env, @lobby, goal
